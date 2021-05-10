@@ -3,15 +3,15 @@ import json
 from pathlib import Path
 from dotenv import load_dotenv
 from confluent_kafka import Producer
+import time
 
 delivered_records = 0
 
 def full_flow_producer():
     load_envs()
     producer = get_producer()
-    num_of_messages = 10
-    send_messages(producer, num_of_messages)
-    producer.flush()
+    payload = get_payload()
+    send_messages(producer, payload)
 
 def load_envs():
     env_path = Path('.') / '.env'
@@ -45,14 +45,21 @@ def serve_ack_status(err, msg):
         print("Produced record to topic {} partition [{}] @ offset {}"
                 .format(msg.topic(), msg.partition(), msg.offset()))
 
-def send_messages(producer, num_of_messages):
+def get_payload():
+    with open('poc.json') as f:
+        return json.load(f)
+
+def send_messages(producer, payload):
     topic = 'test_topic'
-    for n in range(num_of_messages):
-        record_key = "alice"
-        record_value = json.dumps({'count': n})
-        partition_key = f"{record_key}_{n}"
-        print("Producing record: {}\t{}".format(partition_key, record_value))
-        producer.produce(topic, key=partition_key, value=record_value, on_delivery=serve_ack_status)
+    for item in payload:
+        token = item.get('token')
+        record_key = token
+        record_value = json.dumps(item)
+        print("Producing record: {}\t{}".format(record_key, record_value))
+        producer.produce(topic, key=record_key, value=record_value, on_delivery=serve_ack_status)
         producer.poll(0)
+        producer.flush()
+        time.sleep(30)
+
 
 full_flow_producer()

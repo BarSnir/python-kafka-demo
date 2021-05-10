@@ -41,7 +41,6 @@ def subscribe(consumer):
     consumer.subscribe([topic])
 
 def consume(consumer):
-    total_count = 0
     try:
         while True:
             msg = consumer.poll(1.0)
@@ -58,12 +57,12 @@ def consume(consumer):
                 # Check for Kafka message
                 record_key = msg.key()
                 record_value = msg.value()
-                data = json.loads(record_value)
-                count = data['count']
-                total_count += count
-                print("Consumed record with key {} and value {}, \
-                      and updated total count to {}"
-                      .format(record_key, record_value, total_count))
+                print(
+                    "Consumed record with key {} and value {}".format(
+                        record_key, 
+                        record_value
+                    )
+                )
     except KeyboardInterrupt:
         pass
     finally:
