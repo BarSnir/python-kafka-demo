@@ -1,24 +1,33 @@
 version: '3'
 services:
-  producer:
-    env_file: 
-    - .env
-    build:
-        context: .
-        dockerfile: .Dockerfile
-    command: python producer/producer.py
-  s3_consumer:
-    env_file: 
-    - .env
-    build:
-        context: .
-        dockerfile: .Dockerfile
-    command: python consumers/s3_consumer.py
-  elasticsearch_consumer:
-    env_file: 
-    - .env
-    build:
-        context: .
-        dockerfile: .Dockerfile
-    command: python consumers/elasticsearch_consumer.py
+    producer:
+        env_file: 
+        - .env
+        build:
+            context: .
+            dockerfile: .Dockerfile
+        command: 
+            - python3 
+            - -u 
+            - producer/producer.py
+    s3_consumer:
+        env_file: 
+        - .env
+        build:
+            context: .
+            dockerfile: .Dockerfile
+        command: 
+        - python3
+        - -u
+        - consumers/s3_consumer.py
+    elasticsearch_consumer:
+        env_file: 
+        - .env
+        build:
+            context: .
+            dockerfile: .Dockerfile
+        command: 
+        - python3
+        - -u
+        - consumers/elasticsearch_consumer.py
   

@@ -1,6 +1,6 @@
 import os
 import json
-import ast
+import logging as log
 from pathlib import Path
 from dotenv import load_dotenv
 from confluent_kafka import Consumer
@@ -9,7 +9,8 @@ from datetime import datetime
 import pytz
 
 
-def full_flow_producer():
+def full_flow_s3_consumer():
+    log.info("S3 consumer is up.")
     load_envs()
     consumer = get_kafka_consumer()
     subscribe(consumer)
@@ -90,4 +91,4 @@ def get_il_time():
     return ct.isoformat()
 
 
-full_flow_producer()    
+full_flow_s3_consumer()    

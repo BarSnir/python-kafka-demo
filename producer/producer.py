@@ -9,7 +9,7 @@ import logging as log
 delivered_records = 0
 
 def full_flow_producer():
-    log.info("Producer Started")
+    log.info("Producer is up.")
     load_envs()
     producer = get_producer()
     payload = get_payload()

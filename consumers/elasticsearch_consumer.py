@@ -1,15 +1,14 @@
 import os
-import json
-import ast
 from pathlib import Path
 from dotenv import load_dotenv
 from confluent_kafka import Consumer
 import boto3
-from datetime import datetime
-import pytz
+import logging as log
 
 
-def full_flow_producer():
+
+def full_flow_elasticsearch_consumer():
+    log.info("Elasticsearch consumer is up.")
     load_envs()
     consumer = get_kafka_consumer()
     subscribe(consumer)
@@ -63,15 +62,15 @@ def consume(consumer, s3_session):
             if msg is None:
                 continue
             elif msg.error():
-                print('error: {}'.format(msg.error()))
+                log.info('error: {}'.format(msg.error()))
             else:
                 # Check for Kafka message
                 record_key = msg.key()
                 record_value = msg.value()
-                print("Consumer for Elasticsearch:", record_key)
+                log.info("Consumer for Elasticsearch:", record_key)
     except KeyboardInterrupt:
         pass
     finally:
         consumer.close()
 
-full_flow_producer()
+full_flow_elasticsearch_consumer()
