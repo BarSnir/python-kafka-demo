@@ -8,7 +8,7 @@ import logging as log
 
 
 def full_flow_elasticsearch_consumer():
-    log.info("Elasticsearch consumer is up.")
+    print("Elasticsearch consumer is up.")
     load_envs()
     consumer = get_kafka_consumer()
     subscribe(consumer)
@@ -62,12 +62,12 @@ def consume(consumer, s3_session):
             if msg is None:
                 continue
             elif msg.error():
-                log.info('error: {}'.format(msg.error()))
+                print('error: {}'.format(msg.error()))
             else:
                 # Check for Kafka message
                 record_key = msg.key()
                 record_value = msg.value()
-                log.info("Consumer for Elasticsearch:", record_key)
+                print("Consumer for Elasticsearch:", record_key)
     except KeyboardInterrupt:
         pass
     finally:

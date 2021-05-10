@@ -10,7 +10,7 @@ import pytz
 
 
 def full_flow_s3_consumer():
-    log.info("S3 consumer is up.")
+    print("S3 consumer is up.")
     load_envs()
     consumer = get_kafka_consumer()
     subscribe(consumer)

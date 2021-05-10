@@ -17,9 +17,9 @@ services:
             context: .
             dockerfile: .Dockerfile
         command: 
-        - python3
-        - -u
-        - consumers/s3_consumer.py
+            - python3
+            - -u
+            - consumers/s3_consumer.py
     elasticsearch_consumer:
         env_file: 
         - .env
@@ -27,7 +27,7 @@ services:
             context: .
             dockerfile: .Dockerfile
         command: 
-        - python3
-        - -u
-        - consumers/elasticsearch_consumer.py
+            - python3
+            - -u
+            - consumers/elasticsearch_consumer.py
   
