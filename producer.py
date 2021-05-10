@@ -46,7 +46,7 @@ def serve_ack_status(err, msg):
                 .format(msg.topic(), msg.partition(), msg.offset()))
 
 def get_payload():
-    with open('poc.json') as f:
+    with open('poc.json', 'r', encoding='utf-8') as f:
         return json.load(f)
 
 def send_messages(producer, payload):

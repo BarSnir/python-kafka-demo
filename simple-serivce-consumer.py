@@ -1,14 +1,20 @@
 import os
 import json
+import ast
 from pathlib import Path
 from dotenv import load_dotenv
 from confluent_kafka import Consumer
+import boto3
+from datetime import datetime
+import pytz
+
 
 def full_flow_producer():
     load_envs()
     consumer = get_kafka_consumer()
     subscribe(consumer)
-    consume(consumer)
+    s3_session = get_s3_session()
+    consume(consumer, s3_session)
 
 def load_envs():
     env_path = Path('.') / '.env'
@@ -40,15 +46,21 @@ def subscribe(consumer):
     topic = 'test_topic'
     consumer.subscribe([topic])
 
-def consume(consumer):
+def get_s3_session():
+    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
+    aws_secrest_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+    session = boto3.Session(
+        aws_access_key_id=aws_access_key_id,
+        aws_secret_access_key=aws_secrest_access_key,
+    )
+    return session.resource('s3')
+
+
+def consume(consumer, s3_session):
     try:
         while True:
             msg = consumer.poll(1.0)
             if msg is None:
-                # No message available within timeout.
-                # Initial message consumption may take up to
-                # `session.timeout.ms` for the consumer group to
-                # rebalance and start consuming
                 print("Waiting for message or event/error in poll()")
                 continue
             elif msg.error():
@@ -57,16 +69,32 @@ def consume(consumer):
                 # Check for Kafka message
                 record_key = msg.key()
                 record_value = msg.value()
-                print(
-                    "Consumed record with key {} and value {}".format(
-                        record_key, 
-                        record_value
-                    )
-                )
+                print("The type of the payload is:", type(record_value))
+                # print(
+                #     "Consumed record with key {} and value {}".format(
+                #         record_key, 
+                #         record_value
+                #     )
+                # )
+                upload_to_s3(record_value, s3_session)
     except KeyboardInterrupt:
         pass
     finally:
-        # Leave group and commit final offsets
         consumer.close()
+
+def upload_to_s3(payload, s3_session):
+    bucket = "kafka-ad-history-poc"
+    dict_payload = json.loads(payload.decode('utf-8'))
+    root_dir=dict_payload.get('token')
+    timestamp = get_il_time()
+    path = f"{root_dir}/{timestamp}.json"
+    s3_object = s3_session.Object(bucket, path)
+    s3_object.put(Body=payload)
+
+def get_il_time():
+    tz = pytz.timezone('Israel')
+    ct = datetime.now(tz=tz)
+    return ct.isoformat()
+
 
 full_flow_producer()    
