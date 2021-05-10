@@ -6,6 +6,9 @@ services:
         build:
             context: .
             dockerfile: .Dockerfile
+        depends_on:
+            - s3_consumer
+            - elasticsearch_consumer
         command: 
             - python3 
             - -u 

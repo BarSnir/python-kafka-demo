@@ -52,7 +52,7 @@ def get_payload():
         return json.load(f)
 
 def send_messages(producer, payload):
-    time.sleep(3)
+
     topic = 'test_topic'
     for item in payload:
         log.info("Producing message")
