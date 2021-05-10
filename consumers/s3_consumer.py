@@ -84,6 +84,8 @@ def upload_to_s3(payload, s3_session):
     path = f"{root_dir}/{timestamp}.json"
     s3_object = s3_session.Object(bucket, path)
     s3_object.put(Body=payload)
+    print("Put data as s3 object.")
+
 
 def get_il_time():
     tz = pytz.timezone('Israel')

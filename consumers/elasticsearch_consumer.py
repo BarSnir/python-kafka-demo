@@ -2,18 +2,16 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 from confluent_kafka import Consumer
-import boto3
-import logging as log
-
-
+from elasticsearch import Elasticsearch
+import json
 
 def full_flow_elasticsearch_consumer():
     print("Elasticsearch consumer is up.")
     load_envs()
     consumer = get_kafka_consumer()
     subscribe(consumer)
-    s3_session = get_s3_session()
-    consume(consumer, s3_session)
+    es_client = get_es_client()
+    consume(consumer, es_client)
 
 def load_envs():
     env_path = Path('.') / '.env'
@@ -45,17 +43,17 @@ def subscribe(consumer):
     topic = 'test_topic'
     consumer.subscribe([topic])
 
-def get_s3_session():
-    aws_access_key_id = os.getenv('AWS_ACCESS_KEY_ID')
-    aws_secrest_access_key = os.getenv('AWS_SECRET_ACCESS_KEY')
-    session = boto3.Session(
-        aws_access_key_id=aws_access_key_id,
-        aws_secret_access_key=aws_secrest_access_key,
+def get_es_client():
+    host_string = "{protocol}://{user}:{password}@{host}".format(
+            protocol=os.environ.get("ELASTICSEARCH_PROTOCOL"),
+            user=os.environ.get("ELASTICSEARCH_USER"),
+            password=os.environ.get("ELASTICSEARCH_PASSWORD"),
+            host=os.environ.get("ELASTICSEARCH_URL"),
     )
-    return session.resource('s3')
+    return Elasticsearch(host_string)
 
 
-def consume(consumer, s3_session):
+def consume(consumer, es_client):
     try:
         while True:
             msg = consumer.poll(1.0)
@@ -68,9 +66,19 @@ def consume(consumer, s3_session):
                 record_key = msg.key()
                 record_value = msg.value()
                 print("Consumer for Elasticsearch:", record_key)
+                index_in_es(es_client, record_value)
     except KeyboardInterrupt:
         pass
     finally:
         consumer.close()
+
+def index_in_es(es_client, value):
+    index = "kafka_streams_poc"
+    body = json.loads(value.decode('utf-8'))
+    es_client.index(
+        index,
+        body,
+    )
+    print("Indexed in Elasticsearch")
 
 full_flow_elasticsearch_consumer()
