@@ -55,11 +55,11 @@ def send_messages(producer, payload):
 
     topic = 'test_topic'
     for item in payload:
-        log.info("Producing message")
         token = item.get('token')
         record_key = token
         record_value = json.dumps(item)
-        print("Producing record: {}\t{}".format(record_key, record_value))
+        print("Producing record: {}".format(record_key))
+        print(record_value)
         producer.produce(topic, key=record_key, value=record_value, on_delivery=serve_ack_status)
         producer.poll(0)
         producer.flush()
