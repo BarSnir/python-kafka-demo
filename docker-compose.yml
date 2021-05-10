@@ -9,6 +9,7 @@ services:
         depends_on:
             - s3_consumer
             - elasticsearch_consumer
+            - notification_consumer
         command: 
             - python3 
             - -u 
@@ -33,4 +34,14 @@ services:
             - python3
             - -u
             - consumers/elasticsearch_consumer.py
+    notification_consumer:
+        env_file: 
+        - .env
+        build:
+            context: .
+            dockerfile: .Dockerfile
+        command: 
+            - python3
+            - -u
+            - consumers/notification_consumer.py
   
