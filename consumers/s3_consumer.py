@@ -28,7 +28,7 @@ def get_kafka_consumer_config():
     host = os.getenv('KAFKA_HOST')
     kafka_username = os.getenv('KAFKA_USER')
     kafka_password = os.getenv('KAFKA_PASS')
-    group_id = 'simple-service-A'
+    group_id = 's3-consumers'
     protocol = 'SASL_SSL'
     mechanisms =  'PLAIN'
     auto_offset_reset = 'earliest'
@@ -61,7 +61,6 @@ def consume(consumer, s3_session):
         while True:
             msg = consumer.poll(1.0)
             if msg is None:
-                print("Waiting for message or event/error in poll()")
                 continue
             elif msg.error():
                 print('error: {}'.format(msg.error()))
@@ -69,13 +68,7 @@ def consume(consumer, s3_session):
                 # Check for Kafka message
                 record_key = msg.key()
                 record_value = msg.value()
-                print("The type of the payload is:", type(record_value))
-                # print(
-                #     "Consumed record with key {} and value {}".format(
-                #         record_key, 
-                #         record_value
-                #     )
-                # )
+                print("Consumer for S3: ", record_key)
                 upload_to_s3(record_value, s3_session)
     except KeyboardInterrupt:
         pass

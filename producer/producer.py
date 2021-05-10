@@ -4,10 +4,12 @@ from pathlib import Path
 from dotenv import load_dotenv
 from confluent_kafka import Producer
 import time
+import logging as log
 
 delivered_records = 0
 
 def full_flow_producer():
+    log.info("Producer Started")
     load_envs()
     producer = get_producer()
     payload = get_payload()
@@ -52,6 +54,7 @@ def get_payload():
 def send_messages(producer, payload):
     topic = 'test_topic'
     for item in payload:
+        log.info("Producing message")
         token = item.get('token')
         record_key = token
         record_value = json.dumps(item)
