@@ -52,7 +52,7 @@ def get_payload():
         return json.load(f)
 
 def send_messages(producer, payload):
-
+    produce_delay_time = int(os.getenv('PRODUCER_DELAY_TIME'))
     topic = 'test_topic'
     for item in payload:
         token = item.get('token')
@@ -63,7 +63,7 @@ def send_messages(producer, payload):
         producer.produce(topic, key=record_key, value=record_value, on_delivery=serve_ack_status)
         producer.poll(0)
         producer.flush()
-        time.sleep(30)
+        time.sleep(produce_delay_time)
 
 
 full_flow_producer()
