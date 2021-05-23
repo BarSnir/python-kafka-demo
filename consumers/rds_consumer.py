@@ -25,7 +25,7 @@ def get_kafka_consumer_config():
     host = os.getenv('KAFKA_HOST')
     kafka_username = os.getenv('KAFKA_USER')
     kafka_password = os.getenv('KAFKA_PASS')
-    group_id = 'notification-consumers'
+    group_id = 'rds-consumer'
     protocol = 'SASL_SSL'
     mechanisms =  'PLAIN'
     auto_offset_reset = 'earliest'
@@ -40,7 +40,7 @@ def get_kafka_consumer_config():
     }
 
 def subscribe(consumer):
-    topic = 'test_topic'
+    topic = 'rds_topic'
     consumer.subscribe([topic])
 
 def consume(consumer):
