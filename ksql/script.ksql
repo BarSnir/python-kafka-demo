@@ -1,0 +1,63 @@
+--  'create stream'
+CREATE STREAM ads ( id INT,
+  token VARCHAR(45) ,
+  category_id INT ,
+  subcategory_id INT ,
+  status_id boolean ,
+  price INT ,
+  feed_section VARCHAR(45) ,
+  top_area_id INT ,
+  top_area_text VARCHAR(45) ,
+  area_id INT ,
+  area_text VARCHAR(45) ,
+  city_id INT ,
+  city_text VARCHAR(45) ,
+  customer_id INT ,
+  customer_name VARCHAR(45) ,
+  customer_phone VARCHAR(45) ,
+  updated VARCHAR(45) ,
+  created VARCHAR(45) ,
+  rebounced VARCHAR(45) ,
+  manufacturer_id INT ,
+  manufacturer_text VARCHAR(45) ,
+  model_id INT ,
+  model_text VARCHAR(45) ,
+  year VARCHAR(45) ,
+  km DOUBLE ,
+  gear_box_id INT ,
+  gear_box_text VARCHAR(45) ,
+  engine_type_id INT ,
+  engine_type_text VARCHAR(45) ,
+  sub_model_id INT ,
+  sub_model_text VARCHAR(45) ,
+  color_id INT ,
+  color_text VARCHAR(45) ,
+  hand_id INT ,
+  hand_text VARCHAR(45) ,
+  owner_id INT ,
+  owner_text VARCHAR(45) ,
+  engine_volume INT ,
+  abs boolean ,
+  air_conditioner boolean ,
+  power_steering boolean ,
+  air_bags INT ,
+  family_type_id INT ,
+  family_type_text VARCHAR(45) )
+WITH (VALUE_FORMAT = 'JSON', KAFKA_TOPIC = 'kafkapoc.kafka_rds_poc.ads');
+
+CREATE TABLE TEST_V3 WITH (KAFKA_TOPIC='pksqlc-2r18oTEST_V3', PARTITIONS=1, REPLICAS=3, KEY_FORMAT="JSON_SR", VALUE_FORMAT="JSON_SR") 
+AS SELECT
+  ADS.TOKEN AS token,
+  (COLLECT_LIST(ADS.PRICE)[ARRAY_LENGTH(COLLECT_LIST(ADS.PRICE))] - COLLECT_LIST(ADS.PRICE)[(ARRAY_LENGTH(COLLECT_LIST(ADS.PRICE)) - 1)]) AS price_change
+FROM ADS
+GROUP BY ADS.TOKEN
+EMIT CHANGES;
+
+--  'create table'
+CREATE TABLE TEST_V3 WITH (KAFKA_TOPIC='pksqlc-2r18oTEST_V3', PARTITIONS=1, REPLICAS=3) 
+AS SELECT
+  ADS.TOKEN AS token,
+  (COLLECT_LIST(ADS.PRICE)[ARRAY_LENGTH(COLLECT_LIST(ADS.PRICE))] - COLLECT_LIST(ADS.PRICE)[(ARRAY_LENGTH(COLLECT_LIST(ADS.PRICE)) - 1)]) AS price_change
+FROM ADS
+GROUP BY ADS.TOKEN
+EMIT CHANGES;
