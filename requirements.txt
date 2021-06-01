@@ -3,3 +3,4 @@ confluent-kafka==1.6.1
 boto3==1.17.69
 pytz==2021.1
 elasticsearch==7.12.1
+ksql==0.10.2
