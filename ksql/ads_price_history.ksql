@@ -1,6 +1,7 @@
 SELECT 
 ads_with_incrment.TOKEN,
-AS_VALUE(ads_with_incrment.TOKEN),
+AS_VALUE(ads_with_incrment.TOKEN) TOKEN_VALUE,
+FORMAT_TIMESTAMP(FROM_UNIXTIME(UNIX_TIMESTAMP()), 'yyyy-MM-dd HH:mm:ss.SSS', 'UTC') ACTION_TIME,
 CASE WHEN count(ads_with_incrment.TOKEN ) > 1 THEN    
 COLLECT_LIST(ads_with_incrment.PRICE)[ARRAY_LENGTH(COLLECT_LIST(ads_with_incrment.PRICE))] -    
 COLLECT_LIST(ads_with_incrment.PRICE)[(ARRAY_LENGTH(COLLECT_LIST(ads_with_incrment.PRICE)) - 1)]   
@@ -8,4 +9,6 @@ END AS PRICE_CHANGE,
 COLLECT_LIST(ads_with_incrment.PRICE)[ARRAY_LENGTH(COLLECT_LIST(ads_with_incrment.PRICE))] AS CURRENT_PRICE, 
 CASE WHEN count(ads_with_incrment.TOKEN ) > 1 THEN   
 COLLECT_LIST(ads_with_incrment.PRICE)[(ARRAY_LENGTH(COLLECT_LIST(ads_with_incrment.PRICE)) - 1)]  
-END AS PREV_PRICE FROM ads_with_incrment GROUP BY ads_with_incrment.TOKEN EMIT CHANGES;
+END AS PREV_PRICE,
+count(ads_with_incrment.TOKEN) AS VERSION
+FROM ads_with_incrment GROUP BY ads_with_incrment.TOKEN EMIT CHANGES;
