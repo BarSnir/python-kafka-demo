@@ -1,3 +1,4 @@
+CREATE TABLE v8 AS
 SELECT 
 ads_with_incrment.TOKEN,
 AS_VALUE(ads_with_incrment.TOKEN) TOKEN_VALUE,
@@ -11,4 +12,5 @@ CASE WHEN count(ads_with_incrment.TOKEN ) > 1 THEN
 COLLECT_LIST(ads_with_incrment.PRICE)[(ARRAY_LENGTH(COLLECT_LIST(ads_with_incrment.PRICE)) - 1)]  
 END AS PREV_PRICE,
 count(ads_with_incrment.TOKEN) AS VERSION
-FROM ads_with_incrment GROUP BY ads_with_incrment.TOKEN EMIT CHANGES;
+FROM ads_with_incrment 
+GROUP BY ads_with_incrment.TOKEN EMIT CHANGES;
