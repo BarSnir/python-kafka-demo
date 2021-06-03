@@ -1,16 +1,15 @@
-CREATE TABLE v8 AS
+CREATE TABLE ads_price_history WITH (KAFKA_TOPIC='json-sr-price-change', PARTITIONS=5, REPLICAS=3, VALUE_FORMAT='JSON_SR')  AS
 SELECT 
-ads_with_incrment.TOKEN,
-AS_VALUE(ads_with_incrment.TOKEN) TOKEN_VALUE,
+with_partitions_by.TOKEN,
+AS_VALUE(with_partitions_by.TOKEN) TOKEN_VALUE,
 FORMAT_TIMESTAMP(FROM_UNIXTIME(UNIX_TIMESTAMP()), 'yyyy-MM-dd HH:mm:ss.SSS', 'UTC') ACTION_TIME,
-CASE WHEN count(ads_with_incrment.TOKEN ) > 1 THEN    
-COLLECT_LIST(ads_with_incrment.PRICE)[ARRAY_LENGTH(COLLECT_LIST(ads_with_incrment.PRICE))] -    
-COLLECT_LIST(ads_with_incrment.PRICE)[(ARRAY_LENGTH(COLLECT_LIST(ads_with_incrment.PRICE)) - 1)]   
+CASE WHEN count(with_partitions_by.TOKEN ) > 1 THEN    
+COLLECT_LIST(with_partitions_by.PRICE)[ARRAY_LENGTH(COLLECT_LIST(with_partitions_by.PRICE))] -    
+COLLECT_LIST(with_partitions_by.PRICE)[(ARRAY_LENGTH(COLLECT_LIST(with_partitions_by.PRICE)) - 1)]   
 END AS PRICE_CHANGE,
-COLLECT_LIST(ads_with_incrment.PRICE)[ARRAY_LENGTH(COLLECT_LIST(ads_with_incrment.PRICE))] AS CURRENT_PRICE, 
-CASE WHEN count(ads_with_incrment.TOKEN ) > 1 THEN   
-COLLECT_LIST(ads_with_incrment.PRICE)[(ARRAY_LENGTH(COLLECT_LIST(ads_with_incrment.PRICE)) - 1)]  
-END AS PREV_PRICE,
-count(ads_with_incrment.TOKEN) AS VERSION
-FROM ads_with_incrment 
-GROUP BY ads_with_incrment.TOKEN EMIT CHANGES;
+COLLECT_LIST(with_partitions_by.PRICE)[ARRAY_LENGTH(COLLECT_LIST(with_partitions_by.PRICE))] AS CURRENT_PRICE, 
+CASE WHEN count(with_partitions_by.TOKEN ) > 1 THEN   
+COLLECT_LIST(with_partitions_by.PRICE)[(ARRAY_LENGTH(COLLECT_LIST(with_partitions_by.PRICE)) - 1)]  
+END AS PREV_PRICE
+FROM with_partitions_by 
+GROUP BY with_partitions_by.TOKEN EMIT CHANGES;
