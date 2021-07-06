@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 poc.json
+ksql-restrcited/
 
 # C extensions
 *.so
