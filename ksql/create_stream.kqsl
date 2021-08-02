@@ -1,4 +1,0 @@
-CREATE STREAM POC_STREAM (
-    after STRUCT<id INTEGER, token VARCHAR,price INTEGER>,
-    before STRUCT<id INTEGER, token VARCHAR,price INTEGER>)
-WITH (KAFKA_TOPIC='kafkapoc.kafka_rds_poc.ads', KEY_FORMAT='KAFKA', VALUE_FORMAT='JSON', PARTITIONS=3);
